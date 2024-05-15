@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Web Chart</title>
+    <!-- Load Google Charts -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+    <!-- Chart Container -->
+    <div id="columnchart_values" style="width: 1500px; height: 500px;"></div>
+    <!-- Next and Previous buttons -->
+    <button id="id_btnPre">Previous</button>
+    <button id="id_btnNext">Next</button>
+
+    <script>
+        function listenBtn() {
+            document.getElementById("id_btnPre").addEventListener("click", function () {
+                console.log("Previous button clicked");
+            });
+            document.getElementById("id_btnNext").addEventListener("click", function () {
+                console.log("next button clicked");
+            });
+        }
+        listenBtn();
+        function getOnceTenORReduceOnceTenItems(weatherData) {
+            var lsWeather = [];
+            lsWeather.push(weatherData);
+            //for (const item of weatherData) {
+
+            //}
+
+            //return 
+        }
+        function getData() {
+            fetch('api.aspx')
+                .then(response => response.json())
+                .then(data => {
+                    const weatherData = data.weather;
+                    console.log(data);
+                    chartData = [['Datetime', 'Temperature', 'Humidity']];
+
+                    for (const item of weatherData) {
+                        if (item.weather_id < 10) {
+                            const datetime = item.time;
+                            const date = new Date(datetime);
+                            console.log("Date:", date.toDateString());
+
+                            const temperature = parseFloat(item.temperature);
+                            const humidity = parseFloat(item.humidity);
+                            chartData.push([date.toDateString(), temperature, humidity]);
+                        }
+                    }
+                    console.log('Chart Data:', chartData);
+                    drawChart(chartData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // Function to draw the chart
+        function drawChart(data) {
+            var chartData = google.visualization.arrayToDataTable(data);
+
+            var options = {
+                title: 'Temperature and Humidity Data',
+                width: 1500,
+                height: 500,
+                bar: { groupWidth: '95%' },
+                legend: { position: 'bottom' },
+                hAxis: {
+                    title: 'Datetime',
+                    slantedText: true,
+                    slantedTextAngle: 45,
+                    textStyle: {
+                        fontSize: 10
+                    },
+                    scrollbar: {
+                        enable: true,
+                        showOnlyOnFocus: true
+                    }
+                }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('columnchart_values'));
+
+            chart.draw(chartData, options);
+        }
+
+        google.charts.load('current', { packages: ['corechart'] });
+        google.charts.setOnLoadCallback(getData);
+    </script>
+</body>
+</html>
